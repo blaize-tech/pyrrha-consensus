@@ -1,22 +1,31 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import "../Pandora.sol";
 
 contract PandoraHooks is Pandora {
-    function PandoraHooks(
+
+    address[3] _workerNodeOwners;
+
+    constructor(
         CognitiveJobFactory _jobFactory,
         WorkerNodeFactory _nodeFactory,
-        address[3] _workerNodeOwners
+        Reputation _reputation
     )
-    Pandora(_jobFactory, _nodeFactory, _workerNodeOwners)
+    Pandora(_jobFactory, _nodeFactory, _reputation)
     public {
     }
 
-    function hook_whitelistedOwner(uint no) returns (address) {
-        return workerNodeOwners[no];
+    function hook_whitelistedOwner(uint256 no)
+    public
+    view
+    returns (address) {
+        return _workerNodeOwners[no];
     }
 
-    function hook_whitelistedOwnerCount() returns (uint) {
-        return workerNodeOwners.length;
+    function hook_whitelistedOwnerCount()
+    public
+    view
+    returns (uint) {
+        return _workerNodeOwners.length;
     }
 }

@@ -1,10 +1,16 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
-import './IStateMachine.sol';
-import '../lifecycle/OnlyOnce.sol';
-import {StateMachineLib as SM} from '../libraries/StateMachineLib.sol';
+import "./IStateMachine.sol";
+import "../lifecycle/OnlyOnce.sol";
+import {StateMachineLib as SM} from "../libraries/StateMachineLib.sol";
 
 contract StateMachine is IStateMachine, OnlyOnce {
+
+    //todo sedescribe jobstates as anum
+
+
+    // todo exp branch replace statemachine lib with modifiers for each state -- and check for gas
+
     /**
      * ## State Machine implementation
      */
@@ -33,7 +39,7 @@ contract StateMachine is IStateMachine, OnlyOnce {
         stateMachine.transitionToState(_newState);
         _;
         stateMachine.currentState = _newState;
-        StateChanged(oldState, stateMachine.currentState);
+        emit StateChanged(oldState, stateMachine.currentState);
         _fireStateEvent();
     }
 
@@ -43,13 +49,13 @@ contract StateMachine is IStateMachine, OnlyOnce {
     modifier transitionThroughState(
         uint8 _transitionState /// Intermediary state to transition through
     ) {
-        var initialState = stateMachine.currentState;
+        uint8 initialState = stateMachine.currentState;
         stateMachine.transitionThroughState(_transitionState);
-        StateChanged(initialState, stateMachine.currentState);
+        emit StateChanged(initialState, stateMachine.currentState);
         _fireStateEvent();
         _;
         stateMachine.currentState = initialState;
-        StateChanged(_transitionState, stateMachine.currentState);
+        emit StateChanged(_transitionState, stateMachine.currentState);
         _fireStateEvent();
     }
 
@@ -73,7 +79,7 @@ contract StateMachine is IStateMachine, OnlyOnce {
     }
 
     /// @dev Private method initializing state machine. Must be called only once from the contract constructor
-    function _initStateMachine() internal onlyOnce('_initStateMachine') {
+    function _initStateMachine() internal onlyOnce("_initStateMachine") {
         // Initializing state machine via library code
         stateMachine.initStateMachine();
     }
